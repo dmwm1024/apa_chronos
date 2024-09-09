@@ -1,0 +1,2 @@
+FLASK_APP=apa.py
+FLASK_DEBUG=1

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="w3-left w3-margin">
+    <br>
+    <h1>All Venues</h1>
+    <a class="w3-button w3-blue" href="{{ url_for('venue.create') }}">New</a>
+</div>
+
+<div class="w3-container">
+    <div class="w3-row-padding" style="margin:0 -16px">
+        <div class="w3-responsive w3-card-4 w3-margin">
+            <table class="w3-table w3-striped w3-bordered">
+                <thead>
+                <tr class="w3-theme">
+                    <th>Venue Name</th>
+                    <th>Table Count</th>
+                    <th>Address</th>
+                    <th>Phone</th>
+                    <th>Website</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for v in venues %}
+                <tr>
+                    <td><a href="{{ url_for('venue.update', Venue_ID=v.Venue_ID) }}">{{ v.Venue_Name }}</a></td>
+                    <td>{{ v.pooltables|length }}</td>
+                    <td>{{ v.Venue_Address }}</td>
+                    <td>{{ v.Venue_Phone }}</td>
+                    <td>{{ v.Venue_Website }}</td>
+                    <td><a class="w3-button w3-red" href="{{ url_for('venue.delete', Venue_ID=v.Venue_ID) }}">Delete</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

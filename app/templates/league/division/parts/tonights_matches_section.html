@@ -1,0 +1,26 @@
+<header class="w3-container" style="padding-top:22px">
+    <h5><b><i class="fa fa-dashboard"></i> Tonight's Matches</b></h5>
+</header>
+<br>
+<div class="w3-container w3-card-4 w3-margin">
+    <table class="w3-table w3-striped w3-bordered w3-margin-left">
+        <thead>
+        <tr class="w3-theme">
+            <th>Match Date</th>
+            <th>Home Team</th>
+            <th>Away Team</th>
+            <th>Table(s)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for match in matches_tonight %}
+        <tr>
+            <td>{{ match.Match_PlayDate }}</td>
+            <td>{{ match.home_team.Team_Name }}</td>
+            <td>{{ match.away_team.Team_Name}}</td>
+            <td>{{ match.PoolTable_rel.PoolTable_Name }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

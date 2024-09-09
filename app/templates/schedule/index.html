@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import "theme/top_container.html" as top_container %}
+{% import "bootstrap_wtf.html" as wtf %}
+
+{% block content %}
+<div class="w3-left w3-margin">
+    {% if error %}
+    <p style="color: red">{{ error }}</p>
+    {% endif %}
+    {% if form %}
+    <form action="" class="form" enctype="multipart/form-data" method="post" role="form">
+        {{ wtf.quick_form(form) }}
+    </form>
+    {% endif %}
+    {% if schedules %}
+    {% for s in schedules %}
+
+    <h1>Division Number: {{ s.division_number }}</h1><br>
+    <h3>Matches:</h3><br>
+    <table class="w3-table w3-striped w3-bordered w3-margin-left">
+        <tr class="w3-theme">
+            <th>Match_WeekNum</th>
+            <th>Match_PlayDate</th>
+            <th>Division Name</th>
+            <th>Home Team</th>
+            <th>Away Team</th>
+            <th>Venue</th>
+            <th>Table</th>
+        </tr>
+        {% for match in scheduled_matches %}
+        <tr>
+            <td>{{ match.Match_WeekNum }}</td>
+            <td>{{ match.Match_PlayDate }}</td>
+            <td>{{ match.Division }}</td>
+            <td>{{ match.HomeTeam }}</td>
+            <td>{{ match.AwayTeam }}</td>
+            <td>{{ match.Venue }}</td>
+            <td>{{ match.PoolTable }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br><br>
+    <h3>Raw Text:</h3><br>
+    <textarea rows="4" cols="50">{{ s.full_text }}</textarea>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% import "theme/top_container.html" as top_container %}
+
+{% block content %}
+<header class="w3-container" style="padding-top:22px">
+    <h5><b><i class="fa fa-dashboard"></i> My Dashboard</b></h5>
+</header>
+
+<div class="w3-row-padding w3-margin-bottom">
+    <div class="w3-quarter">
+        <div class="w3-container w3-red w3-padding-16">
+            <div class="w3-left"><i class="fa fa-share-alt w3-xxxlarge"></i></div>
+            <div class="w3-right">
+                <h3>{{ divisions|length }}</h3>
+            </div>
+            <div class="w3-clear "></div>
+            <h4>Total Divisions</h4>
+        </div>
+    </div>
+    <div class="w3-quarter">
+        <a href="{{ url_for('venue.index') }}">
+            <div class="w3-container w3-blue w3-padding-16">
+                <div class="w3-left"><i class="fa fa-building-o w3-xxxlarge"></i></div>
+                <div class="w3-right">
+                    <h3>{{ venues|length }}</h3>
+                </div>
+                <div class="w3-clear"></div>
+                <h4>Total Venues</h4>
+            </div>
+        </a>
+    </div>
+    <div class="w3-quarter">
+        <div class="w3-container w3-teal w3-padding-16">
+            <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
+            <div class="w3-right">
+                <h3>{{ teams|length }}</h3>
+            </div>
+            <div class="w3-clear"></div>
+            <h4>Total Teams</h4>
+        </div>
+    </div>
+    {% if False %}
+    <div class="w3-quarter">
+        <div class="w3-container w3-orange w3-text-white w3-padding-16">
+            <div class="w3-left"><i class="fa fa-trophy w3-xxxlarge"></i></div>
+            <div class="w3-right">
+                <h3>50</h3>
+            </div>
+            <div class="w3-clear"></div>
+            <h4>Patch Requests</h4>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="w3-container">
+    <br>
+    <h5>All Divisions</h5>
+    <div class="w3-row-padding" style="margin:0 -16px">
+        {% if venues|length >= 1 %}
+            <a class="w3-button w3-blue" href="{{ url_for('division.create') }}">New Division</a>
+        {% endif %}
+        <a class="w3-button w3-blue" href="{{ url_for('venue.create') }}">New Venue</a>
+        <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white w3-margin-top">
+            <thead>
+                <th>Division Name</th>
+                <th>Venue</th>
+                <th>Team(s)</th>
+                <th>Matches</th>
+                <th>Patch Requests</th>
+            </thead>
+            {% for d in divisions %}
+            <tr>
+                <td><a href="{{ url_for('division.manage', Division_ID=d.Division_ID) }}">{{ d.Division_Number }} - {{ d.Division_Name }}</a></td>
+                {% if d.Venue_rel %}
+                <td><a href="{{ url_for('venue.update', Venue_ID=d.Venue_rel.Venue_ID) }}">{{ d.Venue_rel.Venue_Name }}</a></td>
+                {% else %}
+                <td>Unassigned</td>
+                {% endif %}
+                <td>{{ d.teams|length }}</td>
+                <td>{{ d.matches|length }}</td>
+                <td>#</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

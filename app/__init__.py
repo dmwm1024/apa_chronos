@@ -1,7 +1,8 @@
 from flask import Flask, request, current_app
 from app import models
-from .extensions import db, migrate, babel
+from .extensions import db, migrate, babel, engine
 from config import Config
+from sqlalchemy.orm import sessionmaker
 from flask_babel import Babel, lazy_gettext as _l
 
 
@@ -39,5 +40,8 @@ def create_app():
 
     from app.schedule.routes import bp as schedule_bp
     app.register_blueprint(schedule_bp)
+
+    from app.testing.routes import bp as testing_bp
+    app.register_blueprint(testing_bp)
 
     return app

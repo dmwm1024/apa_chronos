@@ -4,18 +4,23 @@ from flask_babel import _
 from app.schedule import bp
 from app.schedule.forms import FileUpload
 from app.services.helpers import ScheduleExtractor, Schedule
-from app.models import Division, Team, Match
+from app.models import Division, Team, Schedule
 from app.extensions import db
 
 from datetime import datetime
 
 from collections import defaultdict
+from app.services.TableWizard import TableWizard
 
 import random
 
 
 @bp.route('/schedule', methods=['GET', 'POST'])
 def index():
+    tw = TableWizard()
+
+    # OLD SHIT
+    '''
     form = FileUpload()
 
     if request.method == 'POST':
@@ -61,8 +66,8 @@ def index():
         return redirect(url_for('main.index'))
 
     print('Here 4')
-    return render_template('schedule/index.html', title='Scheduler', form=form)
-
+    '''
+    return render_template('schedule/index.html', title='Scheduler', messages=tw.output_messages)
 
 def CreateMatches(scheduled_matches):
     # def Match_Exists(Division_ID, Venue_ID, Match_PlayDate, HomeTeam_ID, AwayTeam_ID)

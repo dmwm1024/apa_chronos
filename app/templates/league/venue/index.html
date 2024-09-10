@@ -15,21 +15,14 @@
                 <tr class="w3-theme">
                     <th>Venue Name</th>
                     <th>Table Count</th>
-                    <th>Address</th>
-                    <th>Phone</th>
-                    <th>Website</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for v in venues %}
                 <tr>
-                    <td><a href="{{ url_for('venue.update', Venue_ID=v.Venue_ID) }}">{{ v.Venue_Name }}</a></td>
+                    <td><a href="{{ url_for('venue.update', Venue_ID=v.id) }}">{{ v.name }}</a></td>
                     <td>{{ v.pooltables|length }}</td>
-                    <td>{{ v.Venue_Address }}</td>
-                    <td>{{ v.Venue_Phone }}</td>
-                    <td>{{ v.Venue_Website }}</td>
-                    <td><a class="w3-button w3-red" href="{{ url_for('venue.delete', Venue_ID=v.Venue_ID) }}">Delete</a></td>
                 </tr>
                 {% endfor %}
                 </tbody>

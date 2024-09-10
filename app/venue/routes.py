@@ -3,14 +3,17 @@ from flask_babel import _
 
 from app import db
 from app.venue import bp
-from app.venue.forms import VenueForm, VenueForm_Delete
+from app.venue.forms import VenueForm, VenueForm_Delete, PoolTableForm
 from app.models import Venue, PoolTable
+from app.extensions import SessionLocal
 
 
 @bp.route('/venue', methods=['GET', 'POST'])
 def index():
-    venues = Venue.query.all()
-    print('Test - Venue.Routes')
+    db = SessionLocal()
+
+    venues = db.query(Venue).all()
+
     return render_template('league/venue/index.html', title='Home', venues=venues)
 
 
@@ -34,27 +37,36 @@ def create():
 @bp.route('/venue/<int:Venue_ID>/update', methods=['GET', 'POST'])
 def update(Venue_ID):
     form = VenueForm()
+    pooltable_form = PoolTableForm()
+
     deleteForm = VenueForm_Delete
-    venue = Venue.query.get_or_404(Venue_ID)
-    pooltables = PoolTable.query.filter_by(Venue=Venue_ID)
+
+    db = SessionLocal()
+
+    venue = db.query(Venue).filter_by(id=Venue_ID).first()
+
+    pooltables = venue.pooltables
 
     if request.method == 'GET':
-        form.Venue_Name.data = venue.Venue_Name
-        form.Venue_Address.data = venue.Venue_Address
-        form.Venue_Phone.data = venue.Venue_Phone
-        form.Venue_Website.data = venue.Venue_Website
+        form.Venue_Name.data = venue.name
 
     if request.method == 'POST':
-        venue.Venue_Name = form.Venue_Name.data
-        venue.Venue_Address = form.Venue_Address.data
-        venue.Venue_Phone = form.Venue_Phone.data
-        venue.Venue_Website = form.Venue_Website.data
+        if pooltable_form.PoolTable_Name.data:
+            pooltable_record = PoolTable (
+                name = pooltable_form.PoolTable_Name.data,
+                venue_id = Venue_ID
+            )
+            db.add(pooltable_record)
+            db.commit()
+            flash(_(f'Pool Table Pair ({pooltable_form.PoolTable_Name.data}) has been created.'))
+        else:
+            venue.name = form.Venue_Name.data
 
-        db.session.commit()
-        flash(_(f'Venue {venue.Venue_Name} has been updated.'))
-        return redirect(url_for('venue.index'))
+            db.session.commit()
+            flash(_(f'Venue {venue.name} has been updated.'))
+        return redirect(url_for('venue.update', Venue_ID=venue.id))
 
-    return render_template('league/venue/manage.html', title=_('Update Venue'), venue=venue, pooltables=pooltables, form=form, deleteForm=deleteForm)
+    return render_template('league/venue/manage.html', title=_('Update Venue'), pooltable_form=pooltable_form, venue=venue, pooltables=pooltables, form=form, deleteForm=deleteForm)
 
 
 @bp.route('/venue/<int:Venue_ID>/delete', methods=['GET', 'POST'])

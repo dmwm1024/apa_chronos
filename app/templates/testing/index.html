@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% import "theme/top_container.html" as top_container %}
+{% import "bootstrap_wtf.html" as wtf %}
+
+{% block content %}
+<div class="w3-left w3-margin">
+    {% if counts %}
+    <h3>Successfully refreshed league data:</h3><br>
+    <table class="w3-table w3-striped w3-bordered w3-margin-left">
+        <tr class="w3-theme">
+            <th>Divisions Created</th>
+            <th>Venues Created</th>
+            <th>Teams Created</th>
+            <th>Matches Created</th>
+        </tr>
+        <tr>
+            <td>{{ counts.created_division_count }}</td>
+            <td>{{ counts.created_venue_count }}</td>
+            <td>{{ counts.created_team_count }}</td>
+            <td>{{ counts.created_schedule_count }}</td>
+        </tr>
+    </table>
+    {% endif %}
+
+    {% if err_counts %}
+    <br>
+    <h3>Errors Refreshing Objects</h3><br>
+    <table class="w3-table w3-striped w3-bordered w3-margin-left">
+        <tr class="w3-theme">
+            <th>Division Errors</th>
+            <th>Venue Errors</th>
+            <th>Team Errors</th>
+            <th>Match Errors</th>
+        </tr>
+        <tr>
+            <td>{{ err_counts.error_division_count }}</td>
+            <td>{{ err_counts.error_venue_count }}</td>
+            <td>{{ err_counts.error_team_count }}</td>
+            <td>{{ err_counts.error_schedule_count }}</td>
+        </tr>
+    </table>
+    {% endif %}
+
+
+    {% if parsed_data %}
+    <h1>Divisions</h1>
+
+    <table class="w3-table w3-striped w3-bordered w3-margin-left">
+        <tr class="w3-theme">
+            <th>Division Name</th>
+            <th>Division ID</th>
+            <th>Division Number</th>
+            <th>Format Type</th>
+            <th>Night of Play</th>
+        </tr>
+        {% for division in parsed_data.data.league.divisions %}
+        <tr>
+            <td>{{ division['name'] }}</td>
+            <td>{{ division['id'] }}</td>
+            <td>{{ division['number'] }}</td>
+            <td>{{ division['format'] }}</td>
+            <td>{{ division['nightOfPlay'] }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+    {% endif %}
+
+    {% if json_dump %}
+    <p>{{ json_dump }}</p>
+    {% endif %}
+    {% endblock %}

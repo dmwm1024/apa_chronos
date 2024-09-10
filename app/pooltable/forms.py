@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired
 
 
 class PoolTableForm(FlaskForm):
-    PoolTable_Name = StringField(_l('Pool Table Pair Name'), validators=[DataRequired()])
+    PoolTable_Name = StringField(_l('New Pool Table Pair Name'), validators=[DataRequired()])
     submit = SubmitField(_l('Save'))
 
 

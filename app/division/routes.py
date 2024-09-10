@@ -4,7 +4,9 @@ from flask_babel import _
 from app import db
 from app.division import bp
 from app.division.forms import DivisionForm, DivisionForm_Delete
-from app.models import Division, Team, Match
+from app.models import Division, Team, Schedule, Venue
+
+from app.extensions import SessionLocal
 
 from datetime import date, datetime
 
@@ -16,15 +18,17 @@ def index():
 
 @bp.route('/division/<int:Division_ID>', methods=['GET', 'POST'])
 def manage(Division_ID):
-    division = Division.query.get_or_404(Division_ID)
-    teams = Team.query.filter_by(Division=Division_ID)
+    db = SessionLocal()
 
+    division = db.query(Division).filter_by(id=Division_ID).first()
+    teams = division.teams
     todays_date = date.today()
-    todays_date = datetime.strptime("9/13/2024", "%m/%d/%Y").date()
 
-    matches_tonight = Match.query.filter_by(Division=division.Division_ID, Match_PlayDate=todays_date)
+    matches_tonight = db.query(Schedule).filter_by(division_id=division.id, date=todays_date).all()
 
-    return render_template('league/division/index.html', title='Division Management', division=division, teams=teams, matches_tonight=matches_tonight)
+    venue = db.query(Venue).filter_by(id=division.schedules[0].venue_id).first()
+
+    return render_template('league/division/index.html', title='Division Management', todays_date=todays_date, division=division, teams=teams, matches_tonight=matches_tonight, venue=venue)
 
 
 

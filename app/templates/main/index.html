@@ -57,29 +57,23 @@
     <br>
     <h5>All Divisions</h5>
     <div class="w3-row-padding" style="margin:0 -16px">
-        {% if venues|length >= 1 %}
-            <a class="w3-button w3-blue" href="{{ url_for('division.create') }}">New Division</a>
-        {% endif %}
-        <a class="w3-button w3-blue" href="{{ url_for('venue.create') }}">New Venue</a>
         <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white w3-margin-top">
             <thead>
                 <th>Division Name</th>
                 <th>Venue</th>
+                <th>Division Format</th>
+                <th>Week Night</th>
                 <th>Team(s)</th>
                 <th>Matches</th>
-                <th>Patch Requests</th>
             </thead>
             {% for d in divisions %}
             <tr>
-                <td><a href="{{ url_for('division.manage', Division_ID=d.Division_ID) }}">{{ d.Division_Number }} - {{ d.Division_Name }}</a></td>
-                {% if d.Venue_rel %}
-                <td><a href="{{ url_for('venue.update', Venue_ID=d.Venue_rel.Venue_ID) }}">{{ d.Venue_rel.Venue_Name }}</a></td>
-                {% else %}
-                <td>Unassigned</td>
-                {% endif %}
+                <td><a href="{{ url_for('division.manage', Division_ID=d.id) }}">{{ d.number }} - {{ d.name }}</a></td>
+                <td><a href="{{ url_for('venue.update', Venue_ID=d.schedules[0].venue.id) }}">{{ d.schedules[0].venue.name }}</a></td>
+                <td>{{ d.format }}</td>
+                <td>{{ d.night_of_play }}</td>
                 <td>{{ d.teams|length }}</td>
-                <td>{{ d.matches|length }}</td>
-                <td>#</td>
+                <td>{{ d.schedules|length }}</td>
             </tr>
             {% endfor %}
         </table>

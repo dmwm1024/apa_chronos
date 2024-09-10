@@ -6,9 +6,6 @@ from wtforms.validators import DataRequired
 
 class VenueForm(FlaskForm):
     Venue_Name = StringField(_l('Venue Name'), validators=[DataRequired()])
-    Venue_Address = StringField(_l('Address'))
-    Venue_Phone = StringField(_l('Phone'))
-    Venue_Website = StringField(_l('Website'))
 
     submit = SubmitField(_l('Save'))
 
@@ -19,3 +16,7 @@ class VenueForm_Delete(FlaskForm):
         'Confirmation - This action cannot be undone. All PoolTable related information will also be deleted permanently. Any divisions assigned this Venue will now be unassigned.')
     submit = SubmitField(_l('Delete'))
 
+
+class PoolTableForm(FlaskForm):
+    PoolTable_Name = StringField(_l('New Pool Table Pair Name'), validators=[DataRequired()])
+    submit = SubmitField(_l('Save'))

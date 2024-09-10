@@ -7,3 +7,6 @@ migrations/
 .env
 .DS_Store
 *.log
+*.db
+/app/__pycache__
+/app/division/__pycache__

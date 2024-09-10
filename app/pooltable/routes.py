@@ -6,21 +6,25 @@ from app.pooltable import bp
 from app.pooltable.forms import PoolTableForm, PoolTableForm_Delete
 from app.models import PoolTable, Team, Division, Venue
 
+from app.extensions import SessionLocal
 
 @bp.route('/pooltable/<int:Venue_ID>/create', methods=['GET', 'POST'])
 def create(Venue_ID):
+    db = SessionLocal()
+
     form = PoolTableForm()
-    venue = Venue.query.get_or_404(Venue_ID)
+
+    venue = db.query(Venue).filter_by(id=Venue_ID).first()
 
     if form.validate_on_submit():
-        pooltable = PoolTable(
-            PoolTable_Name=form.PoolTable_Name.data,
-            Venue=venue.Venue_ID
+        pooltable_record =  PoolTable(
+            name=form.PoolTable_Name.data,
+            venue_id=venue.id
         )
-        db.session.add(pooltable)
-        db.session.commit()
+        db.add(pooltable_record)
+        db.commit()
         flash(_('New Pool Table Pair has been created.'))
-        return redirect(url_for('venue.update', Venue_ID=venue.Venue_ID))
+        return redirect(url_for('venue.update', Venue_ID=venue.id))
 
     return render_template('league/venue/manage.html', title='New Pool Table Pair', form=form, venue=venue)
 

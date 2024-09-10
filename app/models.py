@@ -1,92 +1,113 @@
-import datetime
-from typing import List
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Float, Date
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy import ForeignKey, String, Date
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.ext.hybrid import hybrid_property
-
-from .extensions import db
+Base = declarative_base()
 
 
-class Division(db.Model):
-    __tablename__ = "Division"
-    Division_ID: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    Division_Number: Mapped[str] = mapped_column(String())
-    Division_Name: Mapped[str] = mapped_column(String())
+class Session(Base):
+    __tablename__ = "sessions"
+    id = Column(Integer, primary_key=True, autoincrement=False)
+    name = Column(String, nullable=False)
 
-    # One to Many Relationships
-    teams: Mapped[List["Team"]] = relationship(cascade="all,delete")
-    matches: Mapped[List["Match"]] = relationship(cascade="all,delete")
-
-    # One to One Relationships
-    Venue: Mapped[int] = mapped_column(ForeignKey("Venue.Venue_ID"))
-    Venue_rel = relationship("Venue", foreign_keys="Division.Venue")
+    # Relationships
+    divisions = relationship('Division', back_populates='session')
 
 
-class Venue(db.Model):
-    __tablename__ = "Venue"
-    Venue_ID: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    Venue_Name: Mapped[str] = mapped_column(String())
-    Venue_Address: Mapped[str] = mapped_column(String(), nullable=True)
-    Venue_Phone: Mapped[str] = mapped_column(String(), nullable=True)
-    Venue_Website: Mapped[str] = mapped_column(String(), nullable=True)
+class Division(Base):
+    __tablename__ = "divisions"
+    id = Column(Integer, primary_key=True, autoincrement=False)
+    name = Column(String, nullable=False)
+    number = Column(String, nullable=False)
+    format = Column(String, nullable=False)
+    type = Column(String, nullable=False)
+    night_of_play = Column(String, nullable=False)
+    is_mine = Column(Boolean, default=False)
 
-    # One to Many Relationships
-    pooltables: Mapped[List["PoolTable"]] = relationship(cascade="all,delete")
+    # Foreign key to the Session table
+    session_id = Column(Integer, ForeignKey('sessions.id'), nullable=False)
 
-
-class PoolTable(db.Model):
-    __tablename__ = "PoolTable"
-    PoolTable_ID: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    PoolTable_Name: Mapped[str] = mapped_column(String())
-    Venue: Mapped[int] = mapped_column(ForeignKey("Venue.Venue_ID"))
-
-
-class TableAvailability(db.Model):
-    __tablename__ = "TableAvailability"
-    TableAvailability_ID: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    Division: Mapped[int] = mapped_column(ForeignKey("Division.Division_ID"))
-    Venue: Mapped[int] = mapped_column(ForeignKey("Venue.Venue_ID"))
-    PoolTable: Mapped[int] = mapped_column(ForeignKey("PoolTable.PoolTable_ID"))
+    # Relationships with Session, Teams, and Schedules
+    session = relationship('Session', back_populates='divisions')
+    teams = relationship('Team', back_populates='division')
+    schedules = relationship('Schedule', back_populates='division')
 
 
-class Team(db.Model):
-    __tablename__ = "Team"
-    Team_ID: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    Team_Number: Mapped[str] = mapped_column(String())
-    Team_Name: Mapped[str] = mapped_column(String())
-    Division: Mapped[int] = mapped_column(ForeignKey("Division.Division_ID"))
+class Team(Base):
+    __tablename__ = 'teams'
 
-    # Relationships for matches where the team is the home team
-    home_matches: Mapped[List["Match"]] = relationship("Match", foreign_keys="[Match.HomeTeam]", back_populates="home_team", cascade="all,delete")
+    id = Column(Integer, primary_key=True, autoincrement=False)  # Assuming team ID is externally provided
+    name = Column(String, nullable=False)
+    number = Column(String, nullable=False)
 
-    # Relationships for matches where the team is the away team
-    away_matches: Mapped[List["Match"]] = relationship("Match", foreign_keys="[Match.AwayTeam]", back_populates="away_team", cascade="all,delete")
+    # ForeignKey linking to Division and Venue
+    division_id = Column(Integer, ForeignKey('divisions.id'), nullable=False)
+    venue_id = Column(Integer, ForeignKey('venues.id'), nullable=True)
 
-    # Hybrid property to combine both home and away matches
-    @hybrid_property
+    # Relationships with Division and Venue
+    division = relationship('Division', back_populates='teams')
+    venue = relationship('Venue', back_populates='teams')
+
+    # Relationships for matches
+    home_matches = relationship('Schedule', foreign_keys='Schedule.home_team_id', back_populates='home_team')
+    away_matches = relationship('Schedule', foreign_keys='Schedule.away_team_id', back_populates='away_team')
+
+    # Combined relationship to easily access all matches where the team is involved
+    @property
     def all_matches(self):
         return self.home_matches + self.away_matches
 
-    # Alternatively, you can use a method if you prefer:
-    def get_all_matches(self):
-        return self.home_matches + self.away_matches
+
+class Venue(Base):
+    __tablename__ = 'venues'
+
+    id = Column(Integer, primary_key=True, autoincrement=False)  # Assuming venue ID is externally provided
+    name = Column(String, nullable=False)
+
+    # Relationships with Teams, PoolTables and Schedules
+    teams = relationship('Team', back_populates='venue')
+    schedules = relationship('Schedule', back_populates='venue')
+    pooltables = relationship('PoolTable', back_populates='venue')
 
 
-class Match(db.Model):
-    __tablename__ = "Match"
-    Match_ID: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    Match_WeekNum: Mapped[str] = mapped_column(String())
-    Match_PlayDate: Mapped[datetime.date] = mapped_column(Date())
-    Division: Mapped[int] = mapped_column(ForeignKey("Division.Division_ID"))
-    HomeTeam: Mapped[int] = mapped_column(ForeignKey("Team.Team_ID"))
-    AwayTeam: Mapped[int] = mapped_column(ForeignKey("Team.Team_ID"))
-    Venue: Mapped[int] = mapped_column(ForeignKey("Venue.Venue_ID"))
-    PoolTable: Mapped[int] = mapped_column(ForeignKey("PoolTable.PoolTable_ID"))
-    PoolTable_rel = relationship("PoolTable", foreign_keys="Match.PoolTable")
+class PoolTable(Base):
+    __tablename__ = "pooltables"
+    id = Column(Integer, primary_key=True, autoincrement=True)  # Assuming venue ID is externally provided
+    name = Column(String, nullable=False)
 
-    # One-to-many relationship for the home team
-    home_team = relationship("Team", foreign_keys=[HomeTeam], back_populates="home_matches")
+    # ForeignKey linking PoolTable to Venue
+    venue_id = Column(Integer, ForeignKey('venues.id'), nullable=False)
 
-    # One-to-many relationship for the away team
-    away_team = relationship("Team", foreign_keys=[AwayTeam], back_populates="away_matches")
+    # Relationship with Venue
+    venue = relationship('Venue', back_populates='pooltables')
+
+    # Relationship with Schedule
+    schedules = relationship('Schedule', back_populates='pooltable')
+
+
+class Schedule(Base):
+    __tablename__ = 'schedules'
+
+    id = Column(Integer, primary_key=True, autoincrement=False)  # Assuming schedule ID is externally provided
+    description = Column(String, nullable=True)
+    date = Column(Date, nullable=False)
+    week_of_play = Column(Integer, nullable=True)
+    skip = Column(Boolean, default=False)
+    home_team_id = Column(Integer, ForeignKey('teams.id'), nullable=False)
+    away_team_id = Column(Integer, ForeignKey('teams.id'), nullable=False)
+
+    # ForeignKey linking to PoolTable
+    pooltable_id = Column(Integer, ForeignKey('pooltables.id'), nullable=True)
+
+    # ForeignKey linking to Division and Venue
+    division_id = Column(Integer, ForeignKey('divisions.id'), nullable=False)
+    venue_id = Column(Integer, ForeignKey('venues.id'), nullable=True)
+
+    # Relationships with Division and Venue
+    division = relationship('Division', back_populates='schedules')
+    venue = relationship('Venue', back_populates='schedules')
+    pooltable = relationship('PoolTable', back_populates='schedules')
+
+    # Relationships for home and away teams
+    home_team = relationship('Team', foreign_keys=[home_team_id])
+    away_team = relationship('Team', foreign_keys=[away_team_id])

@@ -4,9 +4,7 @@
 
 <div class="w3-center w3-margin">
     <br>
-    <h1>Division {{ division.Division_Number }}: {{ division.Division_Name }}</h1>
-    <a href="{{ url_for('division.update', Division_ID = division.Division_ID) }}" class="w3-button w3-blue">Edit</a>
-    <a href="{{ url_for('division.delete', Division_ID = division.Division_ID) }}" class="w3-button w3-red">Delete</a>
+    <h1>Division {{ division.number }}: {{ division.name }}</h1>
 </div>
 
 {% include 'league/division/parts/venue_section.html' %}

@@ -2,21 +2,22 @@
 {% import "bootstrap_wtf.html" as wtf %}
 
 {% block content %}
-    {% include 'league/venue/parts/update_form.html' %}
+{% include 'league/venue/parts/update_form.html' %}
 
 {% if venue %}
 <div class="w3-container">
     <br>
     <h5>Pool Table Pairs</h5>
     <div class="w3-row-padding" style="margin:0 -16px">
-        <a class="w3-button w3-blue" href="{{ url_for('pooltable.create', Venue_ID=venue.Venue_ID) }}">New Pair</a>
+        {{ wtf.quick_form(pooltable_form) }}
+
         <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white w3-margin-top">
             <thead>
             <th>Table Pair Name</th>
             </thead>
             {% for pt in pooltables %}
             <tr>
-                <td><a href="{{ url_for('pooltable.update', PoolTable_ID=pt.PoolTable_ID) }}">{{ pt.PoolTable_Name }}</a></td>
+                <td><a href="{{ url_for('pooltable.update', PoolTable_ID=pt.id) }}">{{ pt.name }}</a></td>
             </tr>
             {% endfor %}
         </table>

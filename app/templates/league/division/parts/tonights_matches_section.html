@@ -15,10 +15,10 @@
         <tbody>
         {% for match in matches_tonight %}
         <tr>
-            <td>{{ match.Match_PlayDate }}</td>
-            <td>{{ match.home_team.Team_Name }}</td>
-            <td>{{ match.away_team.Team_Name}}</td>
-            <td>{{ match.PoolTable_rel.PoolTable_Name }}</td>
+            <td>{{ match.date }}</td>
+            <td>{{ match.home_team.name }}</td>
+            <td>{{ match.away_team.name}}</td>
+            <td>{{ match.pooltable.name }}</td>
         </tr>
         {% endfor %}
         </tbody>

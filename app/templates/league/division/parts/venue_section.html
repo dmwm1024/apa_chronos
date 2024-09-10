@@ -8,24 +8,13 @@
         <tr class="w3-theme">
             <th>Venue Name</th>
             <th>Table(s)</th>
-            <th>Address</th>
-            <th>Phone</th>
-            <th>Website</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-            {% if division.Venue_rel %}
-            <td><a href="{{ url_for('venue.update', Venue_ID=division.Venue_rel.Venue_ID) }}">{{ division.Venue_rel.Venue_Name }}</a></td>
-            <td>{{ division.Venue_rel.pooltables|length }}</td>
-            <td>{{ division.Venue_rel.Venue_Address }}</td>
-            <td>{{ division.Venue_rel.Venue_Phone }}</td>
-            <td>{{ division.Venue_rel.Venue_Website }}</td>
-            {% else %}
-            <td>Unassigned</a></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            {% if venue %}
+            <td><a href="{{ url_for('venue.update', Venue_ID=venue.id) }}">{{ venue.name }}</a></td>
+            <td>{{ venue.pooltables|length }}</td>
             {% endif %}
         </tr>
         </tbody>

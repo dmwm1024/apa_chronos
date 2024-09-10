@@ -1,17 +1,16 @@
 <header class="w3-container" style="padding-top:22px">
-    <h5><b><i class="fa fa-dashboard"></i> Teams (Expand for Matches)</b> - <a class="w3-button w3-blue" href="{{ url_for('team.create', Division_ID = division.Division_ID) }}">New</a></h5>
+    <h5><b><i class="fa fa-dashboard"></i> Teams (Expand for Matches)</b></h5>
 </header>
 <br>
 <div class="w3-container">
-    {% for t in teams %}
+    {% for t in division.teams %}
     <button class="w3-padding-16 w3-theme w3-button w3-block w3-left-align"
-            onclick="myAccFunc('Team{{ t.Team_ID}}')">
-        ( {{ t.Team_Number}} ) {{ t.Team_Name }} <i class="fa fa-caret-down"></i>
-        - <a href="{{ url_for('team.update', Team_ID=t.Team_ID) }}">Modify Team</a>
-        - <a href="{{ url_for('team.delete', Team_ID=t.Team_ID) }}">Delete Team</a>
+            onclick="myAccFunc('Team{{ t.id}}')">
+        ( {{ t.number}} ) {{ t.name }} <i class="fa fa-caret-down"></i>
+        - <a href="{{ url_for('team.delete', Team_ID=t.id) }}">Delete Team</a>
     </button>
 
-    <div class="w3-hide" id="Team{{ t.Team_ID}}">
+    <div class="w3-hide" id="Team{{ t.id}}">
         <table class="w3-table w3-striped w3-bordered w3-margin-left">
             <thead>
             <tr class="w3-theme">
@@ -23,11 +22,19 @@
             </thead>
             <tbody>
             {% for match in t.all_matches %}
+            {% if match.date == todays_date %}
+            <tr style="background-color: #D6EEEE">
+            {% else %}
             <tr>
-                <td>{{ match.Match_PlayDate }}</td>
-                <td>{{ match.home_team.Team_Name }}</td>
-                <td>{{ match.away_team.Team_Name }}</td>
-                <td>{{ match.PoolTable_rel.PoolTable_Name }}</td>
+            {% endif %}
+                {% if match.date == todays_date %}
+                <td>{{ match.date }} - <b> Today </b></td>
+                {% else %}
+                <td>{{ match.date }}</td>
+                {% endif %}
+                <td>{{ match.home_team.name }}</td>
+                <td>{{ match.away_team.name }}</td>
+                <td>{{ match.pooltable.name }}</td>
             </tr>
             {% endfor %}
             </tbody>

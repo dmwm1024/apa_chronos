@@ -49,7 +49,8 @@ def index():
                         # matches - for each
                         # away (id, isMine, name, number), home (id, isMine, name, number), location (id, name), status
                         # print(s['weekOfPlay'])
-                        api.create_schedule_from_api(s, d)
+                        if not api.create_schedule_from_api(s, d):
+                            break
 
                         if process_Venues or process_Teams:
                             for m in s['matches']:

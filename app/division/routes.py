@@ -26,7 +26,13 @@ def manage(Division_ID):
 
     matches_tonight = db.query(Schedule).filter_by(division_id=division.id, date=todays_date).all()
 
-    venue = db.query(Venue).filter_by(id=division.schedules[0].venue_id).first()
+    venue = {}
+
+    invalid_venue_names = ["No Match This Week"]
+    for match in division.schedules:
+        if match.venue.name not in invalid_venue_names:
+            venue = match.venue
+            break
 
     return render_template('league/division/index.html', title='Division Management', todays_date=todays_date, division=division, teams=teams, matches_tonight=matches_tonight, venue=venue)
 

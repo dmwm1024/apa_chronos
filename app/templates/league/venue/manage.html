@@ -17,7 +17,10 @@
             </thead>
             {% for pt in pooltables %}
             <tr>
-                <td><a href="{{ url_for('pooltable.update', PoolTable_ID=pt.id) }}">{{ pt.name }}</a></td>
+                <td>
+                    <a href="{{ url_for('pooltable.update', PoolTable_ID=pt.id) }}">{{ pt.name }}</a>
+                    - <a href="{{ url_for('pooltable.delete', PoolTable_ID=pt.id) }}">Delete</a>
+                </td>
             </tr>
             {% endfor %}
         </table>

@@ -32,8 +32,8 @@
                 {% else %}
                 <td>{{ match.date }}</td>
                 {% endif %}
-                <td>{{ match.home_team.name }}</td>
-                <td>{{ match.away_team.name }}</td>
+                <td>{{ match.home_team.name }} - {{ match.home_team_id }}</td>
+                <td>{{ match.away_team.name }} - {{ match.away_team_id }}</td>
                 <td>{{ match.pooltable.name }}</td>
             </tr>
             {% endfor %}

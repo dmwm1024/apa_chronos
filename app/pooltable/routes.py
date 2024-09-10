@@ -58,22 +58,23 @@ def update(PoolTable_ID):
 @bp.route('/pooltable/<int:PoolTable_ID>/delete', methods=['GET', 'POST'])
 def delete(PoolTable_ID):
     form = PoolTableForm_Delete()
+    db = SessionLocal()
 
     if request.method == 'GET':
-        pooltable = PoolTable.query.get_or_404(PoolTable_ID)
-        form.PoolTable_Name.data = pooltable.PoolTable_Name
+        pooltable = db.query(PoolTable).filter_by(id=PoolTable_ID).first()
+        form.PoolTable_Name.data = pooltable.name
 
     if request.method == 'POST':
         if form.confirm:
-            pooltable = PoolTable.query.get_or_404(PoolTable_ID)
+            pooltable = db.query(PoolTable).filter_by(id=PoolTable_ID).first()
 
-            db.session.delete(pooltable)
-            db.session.commit()
-            flash(_(f'Table Pair {pooltable.PoolTable_Name} has been deleted.'))
-            return redirect(url_for('venue.manage', Venue_ID=pooltable.Venue.Venue_ID))
+            db.delete(pooltable)
+            db.commit()
+            flash(_(f'Table {pooltable.name} has been deleted.'))
+            return redirect(url_for('venue.update', Venue_ID=pooltable.venue_id))
         else:
-            flash(_(f'Table Pair {pooltable.PoolTable_Name} was not deleted.'))
-            return redirect(url_for('venue.manage', Venue_ID=pooltable.Venue.Venue_ID))
+            flash(_(f'Table {pooltable.name} was not deleted.'))
+            return redirect(url_for('venue.update', Venue_ID=pooltable.venue_id))
 
     return render_template('league/pooltable/manage.html', title=_('Delete Team - Confirmation'), pooltable=pooltable, form=form)
 

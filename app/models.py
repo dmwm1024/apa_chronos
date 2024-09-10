@@ -27,10 +27,16 @@ class Division(Base):
     # Foreign key to the Session table
     session_id = Column(Integer, ForeignKey('sessions.id'), nullable=False)
 
+    # One-to-one ForeignKey to the Venue table
+    venue_id = Column(Integer, ForeignKey('venues.id'), nullable=True)
+
     # Relationships with Session, Teams, and Schedules
     session = relationship('Session', back_populates='divisions')
     teams = relationship('Team', back_populates='division')
     schedules = relationship('Schedule', back_populates='division')
+
+    # Relationship with Venue (one-to-one)
+    venue = relationship('Venue', back_populates='division', uselist=False)
 
 
 class Team(Base):
@@ -63,6 +69,9 @@ class Venue(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=False)  # Assuming venue ID is externally provided
     name = Column(String, nullable=False)
+
+    # One-to-one relationship with Division
+    division = relationship('Division', back_populates='venue', uselist=False)
 
     # Relationships with Teams, PoolTables and Schedules
     teams = relationship('Team', back_populates='venue')

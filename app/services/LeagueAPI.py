@@ -304,6 +304,7 @@ class LeagueAPI:
                 db.add(venue_record)
                 db.commit()
                 self.created_venue_count += 1
+            return venue_record
         except Exception as e:
             self.error_venue_count += 1
             db.rollback()
@@ -336,12 +337,19 @@ class LeagueAPI:
         finally:
             db.close()
 
-    def create_schedule_from_api(self, schedule_data, d):
-        """Create a Schedule from the API response."""
+    def create_schedule_from_api(self, schedule_data, division_data):
+        """Create a Schedule from the API response and update division's venue if identified."""
         db = SessionLocal()
-        msg = ''
 
         try:
+            # Extract the division ID from the dictionary
+            division_id = division_data['id']
+
+            # Query the division record by its ID
+            division_record = db.query(Division).filter_by(id=division_id).first()
+            if not division_record:
+                raise ValueError(f"Division with ID {division_id} not found.")
+
             # Check if the schedule exists
             schedule_record = db.query(Schedule).filter_by(id=schedule_data['id']).first()
             if not schedule_record:
@@ -353,11 +361,35 @@ class LeagueAPI:
                 except ValueError as ve:
                     raise ValueError(f"Error parsing date: {ve}")
 
+                # Track if we've identified the division's venue
+                identified_division_venue = False
+
                 # Iterate over the matches in the schedule data
                 for match_data in schedule_data.get('matches', []):
                     home_team_id = match_data['home']['id']
                     away_team_id = match_data['away']['id']
-                    venue_id = match_data['location']['id']  # Assuming venue ID is always provided
+
+                    # Check if venue exists, and if not, create it
+                    venue_id = match_data['location']['id']
+                    venue_name = match_data['location']['name']
+                    venue_record = db.query(Venue).filter_by(id=venue_id).first()
+
+                    if venue_record is None:
+                        # Create the venue if it doesn't exist
+                        venue_record = Venue(
+                            id=venue_id,
+                            name=venue_name
+                        )
+                        db.add(venue_record)
+                        db.commit()
+                        self.created_venue_count += 1  # Increment the created venue counter
+
+                    # Check and update division's venue if not already assigned
+                    if not identified_division_venue and division_record.venue_id is None and venue_record.name != "No Match This Week":
+                        division_record.venue_id = venue_record.id  # Assign venue to division
+                        db.add(division_record)
+                        db.commit()
+                        identified_division_venue = True  # Mark that the venue has been identified for the division
 
                     # Create a new schedule entry for each match
                     schedule_record = Schedule(
@@ -368,18 +400,19 @@ class LeagueAPI:
                         home_team_id=home_team_id,  # Home team foreign key
                         away_team_id=away_team_id,  # Away team foreign key
                         skip=schedule_data.get('skip', False),
-                        division_id=d['id'],  # Foreign key reference to division
-                        venue_id=venue_id  # Foreign key reference to venue
+                        division_id=division_record.id,  # Foreign key reference to division
+                        venue_id=venue_record.id  # Foreign key reference to venue
                     )
                     db.add(schedule_record)
                     db.commit()
                     self.created_schedule_count += 1
 
+                return True
+
         except Exception as e:
             self.error_schedule_count += 1
             db.rollback()
             print(f"Error creating schedule: {e}")
-            print(schedule_data)
+            return False
         finally:
             db.close()
-

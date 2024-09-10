@@ -69,7 +69,11 @@
             {% for d in divisions %}
             <tr>
                 <td><a href="{{ url_for('division.manage', Division_ID=d.id) }}">{{ d.number }} - {{ d.name }}</a></td>
-                <td><a href="{{ url_for('venue.update', Venue_ID=d.schedules[0].venue.id) }}">{{ d.schedules[0].venue.name }}</a></td>
+                {% if d.venue %}
+                <td><a href="{{ url_for('venue.update', Venue_ID=d.venue.id) }}">{{ d.venue.name }}</a></td>
+                {% else %}
+                <td><a href="#">Unknown</a></td>
+                {% endif %}
                 <td>{{ d.format }}</td>
                 <td>{{ d.night_of_play }}</td>
                 <td>{{ d.teams|length }}</td>

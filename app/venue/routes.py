@@ -72,16 +72,17 @@ def update(Venue_ID):
 @bp.route('/venue/<int:Venue_ID>/delete', methods=['GET', 'POST'])
 def delete(Venue_ID):
     form = VenueForm_Delete()
+    db = SessionLocal()
 
     if request.method == 'GET':
-        venue = Venue.query.get_or_404(Venue_ID)
+        venue = db.query(Venue).filter_by(id=Venue_ID).first()
         form.Venue_Name.data = venue.Venue_Name
 
     if request.method == 'POST':
         if form.confirm:
-            venue = Venue.query.get_or_404(Venue_ID)
-            db.session.delete(venue)
-            db.session.commit()
+            venue = db.query(Venue).filter_by(id=Venue_ID).first()
+            db.delete(venue)
+            db.commit()
             flash(_(f'Venue {venue.Venue_Name} has been deleted.'))
             return redirect(url_for('main.index'))
         else:

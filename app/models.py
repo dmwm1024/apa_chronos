@@ -27,7 +27,7 @@ class Division(Base):
     # Foreign key to the Session table
     session_id = Column(Integer, ForeignKey('sessions.id'), nullable=False)
 
-    # One-to-one ForeignKey to the Venue table
+    # One-to-one ForeignKey to the Venue table - Not Found?
     venue_id = Column(Integer, ForeignKey('venues.id'), nullable=True)
 
     # Relationships with Session, Teams, and Schedules

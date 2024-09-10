@@ -1,7 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_babel import _
 
-from app import db
 from app.pooltable import bp
 from app.pooltable.forms import PoolTableForm, PoolTableForm_Delete
 from app.models import PoolTable, Team, Division, Venue
@@ -48,7 +47,7 @@ def update(PoolTable_ID):
         pooltable = PoolTable.query.get_or_404(PoolTable_ID)
         pooltable.PoolTable_Name = form.PoolTable_Name.data
 
-        db.session.commit()
+        # db.session.commit()
         flash(_(f'Pool Table Pair {pooltable.PoolTable_Name} has been updated.'))
         return redirect(url_for('main.index'))
 

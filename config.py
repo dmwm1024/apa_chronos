@@ -8,7 +8,7 @@ load_dotenv(os.path.join(basedir, '.env'))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'KadeAPA'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'APA_DATABASE.db')
+                              'sqlite:///' + os.path.join(basedir, 'league_data.db')
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None

@@ -58,7 +58,7 @@ class TableWizard:
             return None
 
         if len(self.available_tables) < len(valid_schedules):
-            print(f"Division - {self.venue.division.name}: Not enough available tables to assign.")
+            print(f"Division - {self.venue.name}: Not enough available tables to assign. Have ({len(self.available_tables)}) - Need: {len(valid_schedules)}")
             return None
 
         # Generate all possible table assignments (permutations)

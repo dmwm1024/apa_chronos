@@ -28,7 +28,7 @@ def index():
             distinct_dates = db.query(Schedule.date).filter(Schedule.venue_id == venue.id).distinct().all()
 
             for date in distinct_dates:
-                tw = TableWizard(venue.id, date[0])
+                tw = TableWizard(venue, date[0])
 
     return redirect(url_for('main.index'))
 

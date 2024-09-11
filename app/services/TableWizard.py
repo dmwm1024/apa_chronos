@@ -5,13 +5,13 @@ import itertools
 
 
 class TableWizard:
-    def __init__(self, venue_id, schedule_date):
+    def __init__(self, venue, schedule_date):
         self.db = SessionLocal()
-        self.venue_id = venue_id
+        self.venue = venue
         self.schedule_date = schedule_date
 
-        self.venue = self.db.query(Venue).filter_by(id=self.venue_id).first()
-        self.schedules = self.db.query(Schedule).filter_by(venue_id=self.venue_id, date=self.schedule_date).all()
+        # self.venue = self.db.query(Venue).filter_by(id=self.venue_id).first()
+        self.schedules = self.db.query(Schedule).filter_by(venue_id=self.venue.id, date=self.schedule_date).all()
 
         # Preload schedule information and team names
         self.schedule_info = {schedule.id: schedule for schedule in self.schedules}
@@ -54,11 +54,11 @@ class TableWizard:
 
         # Check if there are valid schedules and tables to work with
         if not valid_schedules:
-            print("No valid schedules to assign tables to.")
+            print(f"Division - {self.venue.division.name}: No valid schedules to assign tables to.")
             return None
 
         if len(self.available_tables) < len(valid_schedules):
-            print("Not enough available tables to assign.")
+            print(f"Division - {self.venue.division.name}: Not enough available tables to assign.")
             return None
 
         # Generate all possible table assignments (permutations)

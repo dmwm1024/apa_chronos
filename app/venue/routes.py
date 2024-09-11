@@ -47,7 +47,16 @@ def update(Venue_ID):
     todays_date = date.today()
 
     venue = db.query(Venue).filter_by(id=Venue_ID).first()
-    schedules = db.query(Schedule).filter_by(venue_id=venue.id, date=todays_date)
+
+    matches_tonight_at_venue = []
+
+    for division in venue.divisions:
+        matches_tonight = db.query(Schedule).filter_by(division_id=division.id, date=todays_date).all()
+        print(f'Division Name: {division.name} - Match Count: {len(matches_tonight)}')
+        for match in matches_tonight:
+            matches_tonight_at_venue.append(match)
+
+    schedules = matches_tonight_at_venue
 
     pooltables = venue.pooltables
 

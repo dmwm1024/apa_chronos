@@ -27,7 +27,7 @@ class Division(Base):
     # Foreign key to the Session table
     session_id = Column(Integer, ForeignKey('sessions.id'), nullable=False)
 
-    # One-to-one ForeignKey to the Venue table - Not Found?
+    # Foreign key to the Venue table - A division can have one venue
     venue_id = Column(Integer, ForeignKey('venues.id'), nullable=True)
 
     # Relationships with Session, Teams, and Schedules
@@ -35,8 +35,23 @@ class Division(Base):
     teams = relationship('Team', back_populates='division')
     schedules = relationship('Schedule', back_populates='division')
 
-    # Relationship with Venue (one-to-one)
-    venue = relationship('Venue', back_populates='division', uselist=False)
+    # Relationship with Venue (many-to-one)
+    venue = relationship('Venue', back_populates='divisions')
+
+
+class Venue(Base):
+    __tablename__ = 'venues'
+
+    id = Column(Integer, primary_key=True, autoincrement=False)  # Assuming venue ID is externally provided
+    name = Column(String, nullable=False)
+
+    # One-to-one relationship with Division
+    divisions = relationship('Division', back_populates='venue')
+
+    # Relationships with Teams, PoolTables and Schedules
+    teams = relationship('Team', back_populates='venue')
+    schedules = relationship('Schedule', back_populates='venue')
+    pooltables = relationship('PoolTable', back_populates='venue')
 
 
 class Team(Base):
@@ -62,21 +77,6 @@ class Team(Base):
     @property
     def all_matches(self):
         return sorted(self.home_matches + self.away_matches, key=lambda match: match.date)
-
-
-class Venue(Base):
-    __tablename__ = 'venues'
-
-    id = Column(Integer, primary_key=True, autoincrement=False)  # Assuming venue ID is externally provided
-    name = Column(String, nullable=False)
-
-    # One-to-one relationship with Division
-    division = relationship('Division', back_populates='venue', uselist=False)
-
-    # Relationships with Teams, PoolTables and Schedules
-    teams = relationship('Team', back_populates='venue')
-    schedules = relationship('Schedule', back_populates='venue')
-    pooltables = relationship('PoolTable', back_populates='venue')
 
 
 class PoolTable(Base):

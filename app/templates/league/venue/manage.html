@@ -46,15 +46,28 @@
             {% for match in schedules %}
             <tr>
                 <td>{{ match.date }}</td>
+                {% if match.home_team %}
                 <td>{{ match.home_team.name }}</td>
-                <td>{{ match.away_team.name}}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                {% if match.away_team %}
+                <td>{{ match.away_team.name }}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                {% if match.pooltable %}
                 <td>{{ match.pooltable.name }}</td>
+                {% else %}
+                <td>Unassigned</td>
+                {% endif %}
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+<br><br>
 {% endif %}
 
 {% endblock %}

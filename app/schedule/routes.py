@@ -11,63 +11,27 @@ from datetime import datetime
 
 from collections import defaultdict
 from app.services.TableWizard import TableWizard
+from app.models import Venue, Schedule
+from app.extensions import SessionLocal
 
 import random
 
 
 @bp.route('/schedule', methods=['GET', 'POST'])
 def index():
-    tw = TableWizard()
 
-    # OLD SHIT
-    '''
-    form = FileUpload()
+    db = SessionLocal()
 
-    if request.method == 'POST':
-        files = request.files.getlist("file")
-        schedules = []
-        division = {}
+    venues = db.query(Venue).all()
+    for venue in venues:
+        if len(venue.pooltables) > 0:
+            distinct_dates = db.query(Schedule.date).filter(Schedule.venue_id == venue.id).distinct().all()
 
-        # ANALYSIS
-        for file in files:
-            schedule = Schedule(file)
-            schedules.append(schedule)
-            last_table_used = defaultdict(lambda: None)
+            for date in distinct_dates:
+                tw = TableWizard(venue.id, date[0])
 
-            # Data Integrity
-            if Division_Exists(schedule.division_number):
-                division = Division.query.filter_by(Division_Number=schedule.division_number).first()
-                All_Teams = ValidateTeams(schedule, division)
+    return redirect(url_for('main.index'))
 
-                # Assign Tables
-                pooltables = division.Venue_rel.pooltables
-                if len(pooltables) == 0:
-                    flash(_('You must first create the tables for this venue.'))
-                    error = 'You must first create the tables for this venue.'
-                    print('Here 1')
-                    return render_template('schedule/index.html', title='Scheduler', form=form, error=error)
-
-                scheduled_matches = AssignTables(division, schedule, pooltables, All_Teams)
-
-                CreateMatches(scheduled_matches)
-
-                # AssignTables(division, schedule.matchups)
-
-            # Division does not exist. Terminate.
-            else:
-                print('Division not found.')
-                flash('You must first create this division (Division Number: ' + schedule.division_number + ')')
-                error = 'You must first create this division (Division Number: ' + schedule.division_number + ')'
-                print('Here 2')
-                return render_template('schedule/index.html', title='Scheduler', form=FileUpload(), error=error)
-
-        print('going main')
-        print('Here 3')
-        return redirect(url_for('main.index'))
-
-    print('Here 4')
-    '''
-    return render_template('schedule/index.html', title='Scheduler', messages=tw.output_messages)
 
 def CreateMatches(scheduled_matches):
     # def Match_Exists(Division_ID, Venue_ID, Match_PlayDate, HomeTeam_ID, AwayTeam_ID)

@@ -4,8 +4,10 @@ from flask_babel import _
 from app import db
 from app.venue import bp
 from app.venue.forms import VenueForm, VenueForm_Delete, PoolTableForm
-from app.models import Venue, PoolTable
+from app.models import Venue, PoolTable, Schedule
 from app.extensions import SessionLocal
+
+from datetime import date, datetime
 
 
 @bp.route('/venue', methods=['GET', 'POST'])
@@ -42,8 +44,10 @@ def update(Venue_ID):
     deleteForm = VenueForm_Delete
 
     db = SessionLocal()
+    todays_date = date.today()
 
     venue = db.query(Venue).filter_by(id=Venue_ID).first()
+    schedules = db.query(Schedule).filter_by(venue_id=venue.id, date=todays_date)
 
     pooltables = venue.pooltables
 
@@ -66,7 +70,7 @@ def update(Venue_ID):
             flash(_(f'Venue {venue.name} has been updated.'))
         return redirect(url_for('venue.update', Venue_ID=venue.id))
 
-    return render_template('league/venue/manage.html', title=_('Update Venue'), pooltable_form=pooltable_form, venue=venue, pooltables=pooltables, form=form, deleteForm=deleteForm)
+    return render_template('league/venue/manage.html', title=_('Update Venue'), pooltable_form=pooltable_form, venue=venue, schedules=schedules, pooltables=pooltables, form=form, deleteForm=deleteForm)
 
 
 @bp.route('/venue/<int:Venue_ID>/delete', methods=['GET', 'POST'])

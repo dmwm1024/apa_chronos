@@ -61,7 +61,7 @@ class Team(Base):
     # Combined relationship to easily access all matches where the team is involved
     @property
     def all_matches(self):
-        return self.home_matches + self.away_matches
+        return sorted(self.home_matches + self.away_matches, key=lambda match: match.date)
 
 
 class Venue(Base):

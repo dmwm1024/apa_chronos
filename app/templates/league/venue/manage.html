@@ -27,4 +27,34 @@
     </div>
 </div>
 {% endif %}
+
+{% if schedules %}
+<div class="w3-container">
+    <br>
+    <h5>Matches at this Venue Tonight</h5>
+    <div class="w3-row-padding" style="margin:0 -16px">
+        <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white w3-margin-top">
+            <thead>
+            <tr class="w3-theme">
+                <th>Match Date</th>
+                <th>Home Team</th>
+                <th>Away Team</th>
+                <th>Table(s)</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for match in schedules %}
+            <tr>
+                <td>{{ match.date }}</td>
+                <td>{{ match.home_team.name }}</td>
+                <td>{{ match.away_team.name}}</td>
+                <td>{{ match.pooltable.name }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

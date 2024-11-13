@@ -1,0 +1,13 @@
+*.pyc
+__pycache__/
+.idea/
+.vscode/
+env/
+migrations/
+.env
+.DS_Store
+*.log
+*.db
+/app/__pycache__
+/app/division/__pycache__
+config.py

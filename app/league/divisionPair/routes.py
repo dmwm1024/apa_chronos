@@ -4,12 +4,14 @@ from app.services.LeagueAPI import LeagueAPI
 from app.league.divisionPair.forms import DivisionPairForm
 from app.models import DivisionPair, MatchHistory
 from app import db
+from flask_login import login_required
 import logging
 from app.services.TableWizard import reassign_tables_for_division_pair
 
 
 @bp.route('/divisionPair/', defaults={'DivisionPair_ID': None})
 @bp.route('/divisionPair/<int:DivisionPair_ID>', methods=['GET', 'POST'])
+@login_required
 def index(DivisionPair_ID):
     pairs = DivisionPair.query.all()
     form = DivisionPairForm()
@@ -18,6 +20,7 @@ def index(DivisionPair_ID):
 
 
 @bp.route('/divisionPair/reassignTables/<int:DivisionPair_ID>', methods=['GET', 'POST'])
+@login_required
 def reassignTables(DivisionPair_ID):
     reassign_tables_for_division_pair(DivisionPair_ID)
 
@@ -25,6 +28,7 @@ def reassignTables(DivisionPair_ID):
 
 
 @bp.route('/divisionPair/matches/<int:DivisionPair_ID>', methods=['GET', 'POST'])
+@login_required
 def matches(DivisionPair_ID):
     api = LeagueAPI("https://gql.poolplayers.com/graphql")
     league = api.query_league(slug='jacksonville')
@@ -74,6 +78,7 @@ def matches(DivisionPair_ID):
 
 
 @bp.route('/divisionPair/create', methods=['GET', 'POST'])
+@login_required
 def create_DivisionPair():
     form = DivisionPairForm()
 
@@ -95,6 +100,7 @@ def create_DivisionPair():
 
 
 @bp.route('/divisionPair/delete/<int:DivisionPair_ID>', methods=['GET', 'POST'])
+@login_required
 def delete_divisionPair(DivisionPair_ID):
     pair = DivisionPair.query.get(DivisionPair_ID)
     if pair:
@@ -104,6 +110,7 @@ def delete_divisionPair(DivisionPair_ID):
 
 
 @bp.route('/divisionPair/edit/<int:DivisionPair_ID>', methods=['GET', 'POST'])
+@login_required
 def edit_divisionPair(DivisionPair_ID):
     form = DivisionPairForm()
     pair = DivisionPair.query.get(DivisionPair_ID)

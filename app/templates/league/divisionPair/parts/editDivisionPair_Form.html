@@ -1,0 +1,29 @@
+<form action="{{ url_for('divisionPair.edit_divisionPair', DivisionPair_ID=form.id) }}" method="POST">
+    {{ form.hidden_tag() }}
+    <div class="w3-row-padding">
+        <div class="w3-col m8 w3-margin-bottom">
+            <label>{{ form.division_a.label }}</label>
+            {{ form.division_a(class_="w3-input w3-border w3-round") }}
+        </div>
+        <div class="w3-col m8 w3-margin-bottom">
+            <label>{{ form.division_b.label }}</label>
+            {{ form.division_b(class_="w3-input w3-border w3-round") }}
+        </div>
+        <div class="w3-col m8 w3-margin-bottom">
+            <label>{{ form.location.label }}</label>
+            {{ form.location(class_="w3-input w3-border w3-round") }}
+        </div>
+        <div class="w3-col m8 w3-margin-bottom">
+            <label>{{ form.weeknight.label }}</label>
+            {{ form.weeknight(class_="w3-select w3-border w3-round") }}
+        </div>
+        <div class="w3-col m8 w3-margin-bottom">
+            <label>{{ form.table_string.label }}</label>
+            {{ form.table_string(class_="w3-input w3-border w3-round") }}
+        </div>
+
+        <div class="w3-col m4 w3-margin-bottom w3-center" style="padding-top: 24px;">
+            {{ form.submit(class_="w3-button w3-green w3-round") }}
+        </div>
+    </div>
+</form>

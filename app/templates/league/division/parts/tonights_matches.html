@@ -1,0 +1,125 @@
+<div class="w3-container w3-margin-top">
+    <br>
+    <h1 class="matches-title w3-xxlarge w3-center">Tonight's Matches - {{ division['data']['division']['number'] }}</h1>
+
+    <div class="w3-container w3-margin-bottom">
+        <div class="w3-row w3-center w3-padding-small w3-margin-top">
+            <div class="w3-col s4 w3-left-align">
+                <button class="w3-button w3-light-grey" onclick="changeDate(-1)" style="width: 80%;">&#10094; Previous
+                    Day
+                </button>
+            </div>
+            <div class="w3-col s4">
+                <span class="w3-large w3-padding" id="selectedDate" style="font-weight: bold;"></span>
+            </div>
+            <div class="w3-col s4 w3-right-align">
+                <button class="w3-button w3-light-grey" onclick="changeDate(1)" style="width: 80%;">Next Day &#10095;
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="w3-card-4 w3-padding w3-round-large w3-light-grey w3-animate-opacity">
+        <table class="w3-table w3-table-all w3-hoverable w3-bordered w3-centered w3-large w3-white w3-striped">
+            <thead>
+            <tr class="">
+                <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#matchTable', '.matchRow', 'td:nth-child(1)')">
+                    Match Date
+                </th>
+                <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#matchTable', '.matchRow', 'td:nth-child(2)')">Home
+                    Team
+                </th>
+                <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#matchTable', '.matchRow', 'td:nth-child(3)')">Away
+                    Team
+                </th>
+                <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#matchTable', '.matchRow', 'td:nth-child(4)')">
+                    Match Type
+                </th>
+                <th>Table(s)</th>
+            </tr>
+            </thead>
+            <tbody id="matchTable">
+            <!-- The initial data is loaded here, but it will be updated dynamically with JavaScript -->
+            {% for week in schedule['data']['division']['schedule'] %}
+            {% for match in week['matches'] %}
+            <tr class="matchRow">
+                <td>{{ week['date'] }}</td>
+                <td>{{ match['home']['name'] }}</td>
+                <td>{{ match['away']['name'] }}</td>
+                <td>{{ schedule['data']['division']['format'] }}</td>
+                <td>X</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script>
+    // Store all matches data in a JavaScript variable
+    let matchesData = {{ schedule['data']['division']['schedule'] | tojson }};
+    let currentDate = new Date();
+
+    // Function to format date as yyyy-mm-dd
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+
+    // Function to change the displayed date
+    function changeDate(days) {
+        currentDate.setDate(currentDate.getDate() + days);
+        updateMatches();
+    }
+
+    // Function to update matches based on the selected date
+    function updateMatches() {
+        // Update the displayed date
+        document.getElementById('selectedDate').innerText = currentDate.toDateString();
+
+        // Clear existing table rows
+        let matchTable = document.getElementById('matchTable');
+        matchTable.innerHTML = '';
+
+        // Format the current date to match the date format in the data
+        let selectedDateString = formatDate(currentDate);
+
+        // Filter matches for the selected date
+        let matchesForDate = [];
+        matchesData.forEach(week => {
+            // Convert the week date string to a Date object
+            let weekDate = new Date(week.date);
+            // Compare the formatted date strings
+            if (formatDate(weekDate) === selectedDateString) {
+                matchesForDate = week.matches;
+            }
+        });
+
+        // Add the filtered matches to the table
+        matchesForDate.forEach(match => {
+            let row = `<tr class="matchRow w3-hover-light-grey">
+                            <td>${selectedDateString}</td>
+                            <td>${match.home.name}</td>
+                            <td>${match.away.name}</td>
+                            <td>{{ schedule['data']['division']['format'] }}</td>
+                            <td>X</td>
+                       </tr>`;
+            matchTable.innerHTML += row;
+        });
+
+        // If no matches are found for the selected date, show a message
+        if (matchesForDate.length === 0) {
+            let row = `<tr class="matchRow w3-hover-light-grey">
+                            <td colspan="5" class="w3-text-red w3-center">No matches scheduled for this date.</td>
+                       </tr>`;
+            matchTable.innerHTML += row;
+        }
+    }
+
+    // Initial update for today's matches
+    updateMatches();
+
+
+</script>

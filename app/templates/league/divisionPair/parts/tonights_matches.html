@@ -1,0 +1,145 @@
+<div class="w3-container w3-margin-top">
+    <br>
+    <h1 class="matches-title w3-xxlarge w3-center">
+        Tonight's Matches - {{ division_a['number'] }}
+        {% if division_b %} & {{ division_b['number'] }}{% endif %}
+    </h1>
+    <p>Table String: {{ pair.table_string }}</p>
+
+    <form action="{{ url_for('divisionPair.reassignTables', DivisionPair_ID=pair.id) }}" method="post">
+        <button type="submit" class="w3-button w3-blue">Reassign Tables (All Matches)</button>
+    </form>
+
+    <div class="w3-container w3-margin-bottom">
+        <div class="w3-row w3-center w3-padding-small w3-margin-top">
+            <div class="w3-col s4 w3-left-align">
+                <button class="w3-button w3-light-grey" onclick="changeDate(-1)" style="width: 80%;">&#10094; Previous Day</button>
+            </div>
+            <div class="w3-col s4">
+                <span class="w3-large w3-padding" id="selectedDate" style="font-weight: bold;"></span>
+            </div>
+            <div class="w3-col s4 w3-right-align">
+                <button class="w3-button w3-light-grey" onclick="changeDate(1)" style="width: 80%;">Next Day &#10095;</button>
+            </div>
+        </div>
+        <div class="w3-center">
+            <button class="w3-button w3-blue" onclick="toggleDisplayMode()" id="toggleButton">Show All Matches</button>
+        </div>
+    </div>
+
+    <div class="w3-card-4 w3-padding w3-round-large w3-light-grey w3-animate-opacity">
+        <table class="w3-table w3-table-all w3-hoverable w3-bordered w3-centered w3-large w3-white w3-striped">
+            <thead>
+                <tr>
+                    <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#matchTable', '.matchRow', 'td:nth-child(1)')">Match Date</th>
+                    <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#matchTable', '.matchRow', 'td:nth-child(2)')">Home Team</th>
+                    <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#matchTable', '.matchRow', 'td:nth-child(3)')">Away Team</th>
+                    <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#matchTable', '.matchRow', 'td:nth-child(4)')">Match Type</th>
+                    <th>Table(s)</th>
+                </tr>
+            </thead>
+            <tbody id="matchTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script>
+    // Store assigned tables data passed from the backend
+    const tableAssignments = {{ table_assignments | tojson }};
+
+    let divisionData_a = {
+        format: {{ schedule_a['data']['division']['format'] | tojson }},
+        schedule: {{ schedule_a['data']['division']['schedule'] | tojson }}
+    };
+
+    // Only define `divisionData_b` if `schedule_b` exists
+    {% if schedule_b %}
+    let divisionData_b = {
+        format: {{ schedule_b['data']['division']['format'] | tojson }},
+        schedule: {{ schedule_b['data']['division']['schedule'] | tojson }}
+    };
+    {% endif %}
+
+    // Combine schedules while keeping track of division formats
+    let matchesData = [
+        ...divisionData_a.schedule.map(week => ({ ...week, format: divisionData_a.format })),
+        {% if schedule_b %}
+        ...divisionData_b.schedule.map(week => ({ ...week, format: divisionData_b.format }))
+        {% endif %}
+    ];
+
+    let currentDate = new Date();
+    let displayAllMatches = false; // Toggle state to show all matches or today's matches
+
+    // Function to format date as yyyy-mm-dd
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+
+    // Function to change the displayed date
+    function changeDate(days) {
+        currentDate.setDate(currentDate.getDate() + days);
+        updateMatches();
+    }
+
+    // Function to toggle display mode between all matches and today's matches
+    function toggleDisplayMode() {
+        displayAllMatches = !displayAllMatches;
+        document.getElementById('toggleButton').innerText = displayAllMatches ? "Show Specific Date Matches" : "Show All Matches";
+        updateMatches();
+    }
+
+    // Function to update matches based on the selected date or all dates
+    function updateMatches() {
+        // Update the displayed date if showing today's matches
+        document.getElementById('selectedDate').innerText = displayAllMatches ? "All Dates" : currentDate.toDateString();
+
+        // Clear existing table rows
+        let matchTable = document.getElementById('matchTable');
+        matchTable.innerHTML = '';
+
+        // Format the current date to match the date format in the data
+        let selectedDateString = formatDate(currentDate);
+
+        // Accumulate matches for the selected date or all dates
+        let matchesForDisplay = [];
+        matchesData.forEach(week => {
+            let weekDate = new Date(week.date);
+            if (displayAllMatches || formatDate(weekDate) === selectedDateString) {
+                week.matches.forEach(match => {
+                    matchesForDisplay.push({
+                        match: match,
+                        format: week.format,
+                        date: formatDate(weekDate) // Store the date for each match
+                    });
+                });
+            }
+        });
+
+        // Add the accumulated matches to the table
+        matchesForDisplay.forEach(({ match, format, date }) => {
+            // Get the assigned table number for the match or default to "X" if not assigned
+            const assignedTable = tableAssignments[match.id] || "X";
+            let row = `<tr class="matchRow w3-hover-light-grey">
+                            <td>${date}</td>
+                            <td>${match.home.name} (${match.home.number})</td>
+                            <td>${match.away.name} (${match.away.number})</td>
+                            <td>${format}</td>
+                            <td>${assignedTable}</td>
+                       </tr>`;
+            matchTable.innerHTML += row;
+        });
+
+        // If no matches are found for the selected display mode, show a message
+        if (matchesForDisplay.length === 0) {
+            let row = `<tr class="matchRow w3-hover-light-grey">
+                            <td colspan="5" class="w3-text-red w3-center">No matches scheduled for this date.</td>
+                       </tr>`;
+            matchTable.innerHTML += row;
+        }
+    }
+
+    // Initial update for today's matches
+    updateMatches();
+</script>

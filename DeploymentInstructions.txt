@@ -1,0 +1,11 @@
+Change the version number in the side_bar.
+
+1. On the pythonanywhere dashboard, disable the web app.
+2. Deploy the app
+    1. Using Git Bash: cd C:\Users\andre\PycharmProjects\APA_Chronos
+    2. git commit -a
+    3. git push pythonanywhere
+3. If Needed: Delete the previous league_db at /home/kade/apa_chronos/app
+4. Re-enable the app, and reload the site.
+
+

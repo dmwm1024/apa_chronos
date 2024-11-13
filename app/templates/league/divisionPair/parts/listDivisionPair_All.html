@@ -1,0 +1,42 @@
+<div class="w3-container w3-margin-top">
+    <br>
+    <h1 class="matches-title w3-xxlarge w3-center">Division Pairs</h1>
+
+    <div class="w3-card-4 w3-padding w3-round-large w3-light-grey w3-animate-opacity">
+        <table class="w3-table w3-table-all w3-hoverable w3-bordered w3-centered w3-large w3-white w3-striped">
+                <th></th>
+                <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#divisionPairsTable', '.pairRow', 'td:nth-child(1)')">
+                    Division A
+                </th>
+                <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#divisionPairsTable', '.pairRow', 'td:nth-child(2)')">
+                    Division B
+                </th>
+                <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#divisionPairsTable', '.pairRow', 'td:nth-child(3)')">
+                    Location
+                </th>
+                <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#divisionPairsTable', '.pairRow', 'td:nth-child(4)')">
+                    Weeknight
+                </th>
+                <th class="w3-hover-dark-grey" onclick="w3.sortHTML('#divisionPairsTable', '.pairRow', 'td:nth-child(5)')">
+                    Table String
+                </th>
+                <th></th>
+            <tbody id="divisionPairsTable">
+            <!-- The initial data is loaded here, but it will be updated dynamically with JavaScript -->
+            {% for pair in pairs %}
+            <tr class="pairRow">
+                <td><a href="{{ url_for('divisionPair.matches', DivisionPair_ID=pair.id) }}">Matches</a></td>
+                <td>{{ pair.division_A }}</td>
+                <td>{{ pair.division_B }}</td>
+                <td>{{ pair.location }}</td>
+                <td>{{ pair.weeknight }}</td>
+                <td>{{ pair.table_string }}</td>
+                <td><a href="{{ url_for('divisionPair.edit_divisionPair', DivisionPair_ID=pair.id) }}">Edit</a> - <a href="{{ url_for('divisionPair.delete_divisionPair', DivisionPair_ID=pair.id) }}">Delete</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <a href="{{ url_for('divisionPair.create_DivisionPair') }}">New Division Pair</a>
+    </div>
+</div>
